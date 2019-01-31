@@ -1,0 +1,50 @@
+// You must change the ecobeeId in each rule
+// Check Remote sensor setup below to find instructions on adding/removing sensors
+
+Group ET_All
+Group ET_gSettings (ET_All)
+String ET_name { ecobee="=[123456789012#name]" }
+
+String ET_settings_hvacMode         (ET_gSettings) { ecobee="=[123456789012#settings.hvacMode]" }
+Switch ET_settings_useCelsius       (ET_gSettings) { ecobee="=[123456789012#settings.useCelsius]" }
+Number ET_settings_heatRangeHigh    (ET_gSettings) { ecobee="=[123456789012#settings.heatRangeHigh]" }
+Number ET_settings_heatRangeLow     (ET_gSettings) { ecobee="=[123456789012#settings.heatRangeLow]" }
+Number ET_settings_coolRangeHigh    (ET_gSettings) { ecobee="=[123456789012#settings.coolRangeHigh]" }
+Number ET_settings_coolRangeLow     (ET_gSettings) { ecobee="=[123456789012#settings.coolRangeLow]" }
+
+Group ET_gRuntime (ET_All)
+Number ET_runtime_actualTemperature (ET_gRuntime) { ecobee="<[123456789012#runtime.actualTemperature]" }
+Number ET_runtime_actualHumidity    (ET_gRuntime) { ecobee="<[123456789012#runtime.actualHumidity]" }
+Number ET_runtime_desiredHeat       (ET_gRuntime) { ecobee="<[123456789012#runtime.desiredHeat]" }
+Number ET_runtime_desiredCool       (ET_gRuntime) { ecobee="<[123456789012#runtime.desiredCool]" }
+
+// ** Remote sensor setup**
+// You *MUST* update the item's binding config to match the name you set for the sensor under 
+//      {ecobee="<[123456789012#remoteSensors(<sensor name>).capability(<type>).value]"}
+// The first item should be set to your thermostat's name (mine is called "Downstairs")
+// The temperature item's text will appear in the widget, update accordingly! (with units if you want)
+//
+// The first two items ET_mainThermostat_ represent the main thermostats real temperatue and occupancy
+// then come the remote sensors ET_Remote_*
+//     Add or remove as many pairs of temperature and occupancy items under ET_gRemoteSensors as you need
+Group ET_gRemoteSensors (ET_All)
+//First item in sensor list is the real thermostat
+Number ET_mainThermostat_temperature    "Downstairs [%.1f °C]"      (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Downstairs).capability(temperature).value]" }
+Switch ET_mainThermostat_occupancy      ""                          (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Downstairs).capability(occupancy).value]" }
+//Remote sensor 1
+Number ET_Remote_1_temperature          "Girls' Room [%.1f °C]"     (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Girls Room).capability(temperature).value]" }
+Switch ET_Remote_1_occupancy            ""                          (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Girls Room).capability(occupancy).value]" }
+//Remote sensor 2
+Number ET_Remote_2_temperature          "Boy's Room [%.1f °C]"      (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Boys Room).capability(temperature).value]" }
+Switch ET_Remote_2_occupancy            ""                          (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Boys Room).capability(occupancy).value]" }
+//Remote sensor 3
+Number ET_Remote_3_temperature          "Parents' Room [%.1f °C]"   (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Bedroom).capability(temperature).value]" }
+Switch ET_Remote_3_occupancy            ""                          (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Bedroom).capability(occupancy).value]" }
+
+Group ET_gEvents (ET_All)
+String ET_runningEvent_Type     (ET_gEvents) { ecobee="<[123456789012#runningEvent.type]" }
+String ET_runningEvent_climate  (ET_gEvents) { ecobee="<[123456789012#runningEvent.holdClimateRef]", autoupdate="false" }
+
+//custom rule populated items
+Number ET_userCool (ET_All)
+Number ET_userHeat (ET_All)

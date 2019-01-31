@@ -1,0 +1,105 @@
+//////////////////////////////////////////
+// !! Change this (ecobeeID) to match your own ecobee id 
+//////////////////////////////////////////
+var String ecobeeID = "123456789012"
+rule "Populate userHeat from desiredHeat"
+when  
+  Item ET_runtime_desiredHeat received update
+then
+    if ( ((ET_settings_hvacMode.state.toString == "heat")
+ 		  || (ET_settings_hvacMode.state.toString == "auto"))
+ 		&& ET_runtime_desiredHeat.state instanceof DecimalType)
+    {
+      var Number rounded = ET_runtime_desiredHeat.state as DecimalType
+      rounded = rounded * 2
+      rounded = Math::round(rounded.floatValue) / 2
+      ET_userHeat.postUpdate(rounded)
+    }
+end
+
+rule "Populate userCool from desiredCool"
+when
+  Item ET_runtime_desiredCool received update
+then
+    if ( ((ET_settings_hvacMode.state.toString == "cool")
+          || (ET_settings_hvacMode.state.toString == "auto"))
+        && ET_runtime_desiredCool.state instanceof DecimalType)
+    {
+      var Number rounded = ET_runtime_desiredCool.state as DecimalType
+      rounded = rounded * 2
+      rounded = Math::round(rounded.floatValue) / 2
+      ET_userCool.postUpdate(rounded)
+    }
+end
+
+rule UserHeatHold
+when
+  Item ET_userHeat received command
+then
+  switch ET_settings_hvacMode.state.toString {
+    case "heat" : ET_runtime_desiredHeat.sendCommand(receivedCommand)
+    case "auto" : ET_runtime_desiredHeat.sendCommand(receivedCommand)
+    case "cool" : logWarn("UserHeatHold", "in cool mode, heat setpoint ignored")
+    case "off"  : logWarn("UserHeatHold", "in off mode, heat setpoint ignored")
+  }
+end
+
+rule UserCoolHold
+when
+  Item ET_userCool received command
+then
+  switch ET_settings_hvacMode.state.toString {
+    case "cool" : ET_runtime_desiredCool.sendCommand(receivedCommand)
+    case "auto" : ET_runtime_desiredCool.sendCommand(receivedCommand)
+    case "heat" : logWarn("UserCoolHold", "in heat mode, cool setpoint ignored")
+    case "off"  : logWarn("UserCoolHold", "in off mode, heat setpoint ignored")
+  }
+end
+
+rule HeatHold
+when
+  Item ET_runtime_desiredHeat received command
+then
+  logInfo("HeatHold", "Setting heat setpoint to " + receivedCommand.toString)
+  val DecimalType desiredHeatTemp = receivedCommand as DecimalType
+  var DecimalType desiredCoolTemp
+  if (ET_runtime_desiredCool.state instanceof DecimalType) {
+    desiredCoolTemp = ET_runtime_desiredCool.state as DecimalType
+  } else {
+    desiredCoolTemp = new DecimalType(90)
+  }
+
+  // the 1.9 onwards action bundle uses a selection string instead of an item as the first parameter
+  ecobeeSetHold(ecobeeID, desiredCoolTemp, desiredHeatTemp, null, null, null, null, null)
+end
+
+rule CoolHold
+when
+  Item ET_runtime_desiredCool received command
+then
+  logInfo("CoolHold", "Setting cool setpoint to " + receivedCommand.toString)
+  val DecimalType desiredCoolTemp = receivedCommand as DecimalType
+  var DecimalType desiredHeatTemp
+  if (ET_runtime_desiredHeat.state instanceof DecimalType) {
+    desiredHeatTemp = ET_runtime_desiredHeat.state as DecimalType
+  } else {
+    desiredHeatTemp = new DecimalType(50)
+  }
+
+  // the 1.9 onwards action bundle uses a selection string instead of an item as the first parameter
+  ecobeeSetHold(ecobeeID, desiredCoolTemp, desiredHeatTemp, null, null, null, null, null)
+end
+
+rule ComfortHold
+when
+  Item ET_runningEvent_climate received command
+then
+  if (receivedCommand.toString.equals("resume")) {
+    // the 1.9 onwards action bundle uses a selection string instead of an item as the first parameter
+    ecobeeResumeProgram(ecobeeID, true)
+    ET_runningEvent_Type.postUpdate(receivedCommand.toString)
+  } else {
+    // the 1.9 onwards action bundle uses a selection string instead of an item as the first parameter
+    ecobeeSetHold(ecobeeID, null, null, receivedCommand.toString, null, null, null, null)
+  }
+end

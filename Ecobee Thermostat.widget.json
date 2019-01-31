@@ -1,0 +1,137 @@
+{
+    "name": "Ecobee Thermostat",
+    "author": "RedOranges",
+    "description": "Ecobee Thermostat Widget forked from Signal11",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "sensors_onmain",
+            "label": "Show Sensor Data on Main Panel?"
+        },
+        {
+            "type": "checkbox",
+            "id": "hide_units",
+            "label": "Hide Units?"
+        },
+        {
+            "type": "heading",
+            "label": "Advenced Item overrides",
+            "description": "All items below here you should not have to modify to get this widget to work. Theres are there if you wish to substitute items from the defaults"
+        },
+        {
+            "type": "item",
+            "id": "thermostat_name",
+            "default": "ET_name",
+            "label": "Name of the Thermostat"
+        },
+        {
+            "type": "item",
+            "id": "hvac_mode",
+            "label": "HVAC Mode",
+            "default": "ET_settings_hvacMode"
+        },
+        {
+            "type": "item",
+            "id": "use_celsius",
+            "label": "Use Celsius?",
+            "default": "ET_settings_useCelsius"
+        },
+        {
+            "type": "item",
+            "id": "temperature",
+            "label": "Temperature",
+            "default": "ET_runtime_actualTemperature"
+        },
+        {
+            "type": "item",
+            "id": "humidity",
+            "label": "Humidity",
+            "default": "ET_runtime_actualHumidity"
+        },
+        {
+            "type": "item",
+            "id": "desired_heat",
+            "label": "Desired Heating Level",
+            "default": "ET_runtime_desiredHeat"
+        },
+        {
+            "type": "item",
+            "id": "desired_cool",
+            "label": "Desired Cooling Level",
+            "default": "ET_runtime_desiredCool"
+        },
+        {
+            "type": "item",
+            "id": "user_cool",
+            "label": "User Selected Cooling Level",
+            "default": "ET_userCool"
+        },
+        {
+            "type": "item",
+            "id": "user_heat",
+            "label": "User Selected Heating Level",
+            "default": "ET_userHeat"
+        },
+        {
+            "type": "item",
+            "id": "running_event",
+            "label": "Event Type",
+            "default": "ET_runningEvent_Type"
+        },
+        {
+            "type": "item",
+            "id": "schedule",
+            "label": "Schedule",
+            "default": "ET_runningEvent_climate",
+            "description": "Running event climate"
+        },
+        {
+            "type": "item",
+            "id": "heat_floor",
+            "label": "Lowest heat",
+            "default": "ET_settings_heatRangeLow",
+            "description": "Lowest possible user heat temperature setting."
+        },
+        {
+            "type": "item",
+            "id": "heat_ceil",
+            "label": "Highest heat",
+            "default": "ET_settings_heatRangeHigh",
+            "description": "Highest possible user heat temperature setting."
+        },
+        {
+            "type": "item",
+            "id": "cool_floor",
+            "label": "Lowest cool",
+            "default": "ET_settings_coolRangeLow",
+            "description": "Lowest possible user cool temperature setting."
+        },
+        {
+            "type": "item",
+            "id": "cool_ceil",
+            "label": "Highest cool",
+            "default": "ET_settings_coolRangeHigh",
+            "description": "Highest possible user cool temperature setting. (Change if using Celsius)"
+        },
+        {
+            "type": "string",
+            "id": "active_panel",
+            "label": "Active Panel",
+            "default": "ecobee-main",
+            "description": "Do Not Change"
+        },
+        {
+            "type": "heading",
+            "label": "Remote Sensors",
+            "description": "This widget supports multiple sensors as long as they are all added under the following group."
+        },
+        {
+            "type": "item",
+            "id": "remote_sensors",
+            "label": "Remote Sensors Group",
+            "description": "Each sensor needs two items. The temperature and it's occupancy.",
+            "default": "ET_gRemoteSensors"
+        }
+    ],
+    "template": "<!-- Based off the work of @Signal11 including contributions from Natalie_Nielsen -->\n\n<!--\n+ cancel button missing\n\treplaced with svg\n+ can get get max and min heat from thermostat?\n  \tUse instead of  config.heat_floor etc\n\t\t\tsettings_heatRangeHigh \n\t\t\tsettings_heatRangeLow\n\t\t\tsettings_coolRangeHigh\n\t\t\tsettings_coolRangeLow \n  \tNeed to set \"step\": config.temp_step, to 0.5 if using C\n+ color occupied in sensor panel\n+ color occupied on main panel\n+ hide hamberger if main panel seonsors on\n* Use sensor icon\n+ blue slider and text\n-->\n\n\n<style type=\"text/css\">\n\t#ecobee {\n\t\tposition: absolute;\n\t\ttop: 0px;\n\t\tleft: 0px;\n\t\tdisplay: flex;\n\t\tflex-direction:column;\n\t\twidth: 100%;\n\t\theight: 100%\n\t}\n\t\n\t#ecobee .ecobee-content-panel {\n\t\theight: 100%;\n\t\twidth: 100%;\n\t\tdisplay: flex;\n\t\tflex-direction: column;\n\t}\n\t\n\t.ecobee-flex-panel {\n\t\tdisplay: flex;\n\t\tflex-direction: column;\n\t}\n\t\n\t.ecobee-current-mode {\n\t\tflex: 1;\n\t}\n\t\n\t.ecobee-dialog {\n\t\tflex: 2;\n\t}\n\t\n\timg.ecobee-mode-icon {\n\t  height: 40px;\n\t}\n\t\n\t.ecobee-mode-off {\n\t\tcolor: #b0b4ba;\n\t\theight: 40px;\n\t}\n\t\n\timg.ecobee-humidity-icon {\n\t\theight: 12px;\n\t}\n\t.ecobee-btn {\n\t\tbackground-color:rgba(0, 0, 0, 0.0);\n\t}\n\n\t.ecobee-btn-selected {\n\t\tbackground-color: white;\n\t\tcolor: black;\n\t}\n  \n\t.ecobee-btn-icon {\n\t\tborder:none;\n\t}\n\t\n\t.ecobee-btn-hvac {\n\t\tpadding: 10px 0px 5px;\n\t}\n\t\n\t.ecobee-hvac-btn-group button {\n\t\tborder: 1px solid white; \n\t\tpadding: 10px 15px; \n\t\twidth: 50%; \n\t\tdisplay: block; \n\t\tmargin:0 auto;\n\t}\n\n\t.ecobee-hvac-btn-group button:not(:last-child) {\n\t\tborder-bottom: none; /* Prevent double borders */\n\t}\n  \n\t.ecobee-hvac-btn-group button:first-child {\n\t\tborder-top-right-radius: 10px;\n\t\tborder-top-left-radius: 10px;\n\t}\n  \n\t.ecobee-hvac-btn-group button:last-child {\n\t\tborder-bottom-right-radius: 10px;\n\t\tborder-bottom-left-radius: 10px;\n\t}\n\t\n\t.ecobee-temperature-current { \n\t\tpadding-top: 10px;\n\t\tpadding-bottom: 10px;\n\t}\n\t.ecobee-temperature-current h2 {\n\t\tfont-size: 3.0em;\n\t}\n  \n\t.ecobee-temperature-current h2 span {\n\t\tfont-size: 3.0em;\n\t}\n  \n\t.ecobee-temperature-current h2 span {\n\t\tfont-size: 3.0em;\n\t}\n\t  \n\t.ecobee-temperature-current sup {\n\t\tfont-size:40%; \n\t\tvertical-align: top; \n\t\ttop: 0.9em; \n\t}\n\t.ecobee-sliders {\n\t\tposition:absolute; \n\t\ttop: 60px; \n\t\tright:-5px;  \n\t\theight: 70%;\n\t\twidth: 120px;\n\t}\n\t.ecobee-sliders .ecobee-mode-slider {\n\t\theight: 100%;\n\t\tpadding-top: 20px;\n\t} \n\t.ecobee-resume-dialog {\n\t\tposition:relative;\n\t\tborder: 1px solid white; \n\t\tborder-radius: 5px;\n\t\tdisplay:inline-block;\n\t\twidth:auto;\n\t\tmargin: auto;\n\t\tpadding: 7px 25px 7px 25px;\n\t}\n\t\n\t.ecobee-dialog-close {\n\t\tpadding: 0px;\n\t}\n\t\n\t.ecobee-resume-dialog .ecobee-dialog-close {\n\t\tposition: absolute;\n\t\ttop: -10px;\n\t\tleft: -10px;\n\t}\n  \n  .ecobee_sensors_main {\n  \twidth: 50%;\n  }\n\n\t.ecobee-flex-panel .rzslider.rzvertical {\n\t\theight: 100%;\n\t}\n\n\t.heat-slider .slider-content-vertical .slider-container,\n\t.cool-slider .slider-content-vertical .slider-container,\n\t.auto-heat-slider .slider-content-vertical .slider-container, \n\t.auto-cool-slider .slider-content-vertical .slider-container{\n\t\ttext-align: right!important;\n\t\tpadding-right: 5px;\n\t}\n\t\n\t.heat-slider .rz-bubble,\n\t.auto-heat-slider .rz-bubble {\n\t\tcolor: #FFAA00;\n\t\tfont-size: 1.3em;\n\t}\n\n\t.cool-slider .rz-bubble,\n\t.auto-cool-slider .rz-bubble {\n\t\tcolor: #0DB9F0;\n\t\tfont-size: 1.3em;\n\t}\n\t\n\t.heat-slider .rz-bubble, \n\t.auto-cool-slider .rz-bubble {\n\t\ttop: -30px!important;\n\t}\n\t\t\n\t.cool-slider .rz-bubble, \n\t.auto-heat-slider .rz-bubble{\n\t\tbottom: -30px!important;\n\t}\n\t\n\t.heat-slider .rzslider.rz-vertical .rz-bubble,\n\t.cool-slider .rzslider.rz-vertical .rz-bubble,\n\t.auto-heat-slider .rzslider.rz-vertical .rz-bubble, \n\t.auto-cool-slider .rzslider.rz-vertical .rz-bubble {\n\t\tleft: -20px!important;\n\t}\n\n\t.heat-slider .rz-bubble .rz-limit .rz-ceil,\n\t.cool-slider .rz-bubble .rz-limit .rz-ceil,\n\t.auto-heat-slider .rz-bubble .rz-limit .rz-ceil, \n\t.auto-cool-slider .rz-bubble .rz-limit .rz-ceil {\n\t\tbottom: 0px!important;\n\t}\n\t\n\t.heat-slider .rz-pointer,\n\t.heat-slider .rz-pointer.rz-active:after,\n\t.heat-slider .rzslider .rz-bar.rz-selection,\n\t.auto-heat-slider .rz-pointer,\n\t.auto-heat-slider .rz-pointer.rz-active:after,\n\t.auto-heat-slider .rzslider .rz-bar.rz-selection {\n\t\tbackground-color: #FFAA00;\n\t}\n  \n    /*colour lowest element which some parts will be covered */\n    .cool-slider .rz-pointer,\n    .auto-cool-slider .rz-pointer,\n    .auto-cool-slider .rz-bar \n    {\n        background:#0DB9F0;\n\t\tbackground-color: #0DB9F0;\n    }\n    /*colour inactive bar*/\n\t.auto-cool-slider .rzslider .rz-bar.rz-selection\n    {\n        background:#b0b4ba;\n\t\tbackground-color: #b0b4ba;\n    }\n    /* set the long bar for auto heat to transparent (highest z order) */\n    .auto-heat-slider .rz-bar\n    {\n            background:transparent;\n    }\n\n  \n\t.ecobee-mainmenu-item { \n\t\tfont-size: 1.2em;\n\t\ttext-align: left;\n\t\tpadding-left: 20px;\n\t}\n\t\n\t.ecobee-menu-item {\n\t\tpadding-top: 5px;\n\t\tpadding-bottom: 5px;\n\t}\n\t\n\t.ecobee-menu-topic {\n\t\tfont-size: 0.9em;\n\t\ttext-align: left;\n\t\tpadding-left: 40px;\n\t}\n\t\n  .ecobee-menu-info {\n\t\tcolor: #b0b4ba;\n  \tfont-size: 0.9em;\n  }\n  \n\t.ecobee-menu-data {\n\t\ttext-align: left;\n\t\tpadding-left: 40px;\n\t}\n  .ecobee-occupied {\n    color: var(--primary-color);\n  }\n</style>\n\n<!-- floor and ceil need to be rounded to same unit as step  -->\n<div id=\"ecobee\" ng-init='heatmodel={\"name\": \"heat\", \"item\": config.user_heat, \"vertical\" : \"false\", \"hidelabel\" : \"true\", \"hidelimits\": \"true\",\n                          \"floor\" : (((itemValue(config.heat_floor) * 2)| number : 0) / 2) ,\n                          \"ceil\":  (((itemValue(config.heat_ceil) * 2)| number : 0) / 2 ),\n                          \"step\": (itemValue(config.use_celsius) == \"ON\") ? 0.5 : 1}; \n\t\t\t\t\t\t\t coolmodel={\"name\": \"cool\", \"item\": config.user_cool, \"vertical\" : \"false\", \"hidelabel\" : \"true\", \"hidelimits\": \"true\",\n                          \"floor\" : ((itemValue(config.cool_floor) * 2)| number : 0) / 2 ,\n                          \"ceil\": ((itemValue(config.cool_ceil) * 2)| number : 0) / 2 ,\n                          \"step\": (itemValue(config.use_celsius) == \"ON\") ? 0.5 : 1};\n\t\t\t\t\t\t\t autoheatmodel={\"name\": \"autoheat\", \"item\": config.user_heat, \"vertical\" : \"false\",\"hidelabel\" : \"true\", \"hidelimits\": \"true\",\n                          \"floor\" : (((itemValue(config.heat_floor) * 2)| number : 0) / 2 ),\n                          \"ceil\": ((itemValue(config.cool_ceil) * 2)| number : 0) / 2 ,\n                          \"step\": (itemValue(config.use_celsius) == \"ON\") ? 0.5 : 1};\n\t\t\t\t\t\t\t autocoolmodel={\"name\": \"autocool\", \"item\": config.user_cool, \"vertical\" : \"false\",\"hidelabel\" : \"true\", \"hidelimits\": \"true\",\n                          \"floor\" : (((itemValue(config.heat_floor) * 2)| number : 0) / 2 ),\n                          \"ceil\": ((itemValue(config.cool_ceil) * 2)| number : 0) / 2 ,\n                          \"step\": (itemValue(config.use_celsius) == \"ON\") ? 0.5 : 1};'>\n<!--------------------------------------------------------------- Ecobee Main Panel --------------------------------------------------------------->\n  <div class=\"ecobee-content-panel\" ng-show=\"config.active_panel == 'ecobee-main'\">\n  \t<div class=\"ecobee-thermostat-name\"><h4>{{itemValue(config.thermostat_name)}}</h4></div>\n\t\t<div class=\"ecobee-current-mode\">\n\t\t\t<!-- <div class=\"col-md-12\"> -->\n\t\t\t\t<div>\n\t\t\t\t\t<button class=\"ecobee-btn ecobee-btn-icon ecobee-btn-hvac\" ng-click=\"config.active_panel='ecobee-hvacselect'\">\n\t\t\t\t\t\t<img class=\"ecobee-mode-icon\" src=\"/static/images/ecobee/{{itemValue(config.hvac_mode) | lowercase}}.png\" ng-if=\"itemValue(config.hvac_mode) != 'off'\"/>\n\t\t\t\t\t\t<div class=\"ecobee-mode-off\" ng-if=\"itemValue(config.hvac_mode) == 'off'\">OFF</div>\n\t\t\t\t\t</button>\n\t\t\t\t</div>\n\t\t\t\t<div>\n\t\t\t\t\t<img class=\"ecobee-humidity-icon\" src=\"/static/images/ecobee/drop.png\"/> {{itemValue(config.humidity)}}%\n\t\t\t\t</div>\n\t\t\t\t<div class=\"ecobee-temperature-current\">\n\t\t\t\t\t<h2 ng-if=\"itemValue(config.use_celsius) == 'ON'\">\n\t\t\t\t\t\t{{'%.1f' | sprintf:itemValue(config.temperature)}}\n\t\t\t\t\t\t<sup ng-if=\"!config.hide_units\">°C</sup>\n\t\t\t\t\t</h2>\n\t\t\t\t\t<h2 ng-if=\"itemValue(config.use_celsius) == 'OFF'\">\n\t\t\t\t\t\t{{'%.0f' | sprintf:itemValue(config.temperature)}}\n\t\t\t\t\t\t<sup ng-if=\"!config.hide_units\">°F</sup>\n\t\t\t\t\t</h2>\n\t\t\t\t</div>\n\t\t\t\t<div class=\"ecobee-sliders\" ng-show=\"itemValue(config.hvac_mode) == 'heat'\">\n\t\t\t\t\t<widget-slider class=\"heat-slider\" ng-model=\"heatmodel\" />\n\t\t\t\t</div>\n\t\t\t\t<div class=\"ecobee-sliders\" ng-show=\"itemValue(config.hvac_mode) == 'cool'\">\n\t\t\t\t\t<widget-slider class=\"cool-slider\" ng-model=\"coolmodel\" />\n\t\t\t\t</div>\n\t\t\t\t<div class=\"ecobee-sliders\" ng-show=\"itemValue(config.hvac_mode) == 'auto'\">\n\t\t\t\t\t<widget-slider class=\"auto-cool-slider\" ng-model=\"autocoolmodel\" />\n                </div>\n\t\t\t\t<div class=\"ecobee-sliders\" ng-show=\"itemValue(config.hvac_mode) == 'auto'\">\n\t\t\t\t\t<widget-slider class=\"auto-heat-slider\" ng-model=\"autoheatmodel\" />\n                </div>\n\t\t\t<!-- </div> -->\n\t\t</div>\n\t\t<div class=\"ecobee-dialog\">\n\t\t\t<div style=\"padding-top: 10px; margin: auto;\">\n\t\t\t\t<div class=\"ecobee-resume-dialog\" ng-if=\"itemValue(config.running_event) == 'hold'\">\n\t\t\t\t\t<button class=\"ecobee-btn ecobee-btn-icon ecobee-dialog-close\" ng-click=\"sendCmd(config.schedule, 'resume')\">\n            <svg >\n              <circle cx=\"10\" cy=\"10\" r=\"10\" stroke=\"gray\" fill=\"white\"  shape-rendering=\"geometricPrecision\"/>\n              <line x1=\"5\" y1=\"5\" x2=\"15\" y2=\"15\" stroke=\"black\" stroke-width=\"2\" shape-rendering=\"geometricPrecision\"/>\n              <line x1=\"5\" y1=\"15\" x2=\"15\" y2=\"5\" stroke=\"black\" stroke-width=\"2\" shape-rendering=\"geometricPrecision\"/>\n            </svg>\n\t\t\t\t\t</button>\n\t\t\t\t\t<font ng-if=\"itemValue(config.hvac_mode) == 'cool' || itemValue(config.hvac_mode) == 'auto'\" color=\"#0DB9F0\">\n\t\t\t\t\t\t\t{{itemValue(config.use_celsius) == 'ON'? '%.1f':'%.0f' | sprintf:itemValue(config.desired_cool)}}°\n\t\t\t\t\t</font>\n\t\t\t\t\t{{itemValue(config.hvac_mode) == 'auto' ? ' - ' : ''}}\n\t\t\t\t\t<font ng-if=\"itemValue(config.hvac_mode) == 'heat' || itemValue(config.hvac_mode) == 'auto'\" color=\"#FFAA00\">\n\t\t\t\t\t\t{{itemValue(config.use_celsius) == 'ON'? '%.1f':'%.0f' | sprintf:itemValue(config.desired_heat)}}°\n\t\t\t\t\t</font>\n\t\t\t\t\tand holding\n\t\t\t\t</div>\n\t\t\t\t<div class=\"ecobee-resume-dialog\" ng-if=\"itemValue(config.running_event) == 'resume'\">\n\t\t\t\t\t<button class=\"ecobee-btn ecobee-btn-icon ecobee-dialog-close\" ng-click=\"sendCmd(config.schedule, 'resume')\">\n            <svg >\n              <circle cx=\"10\" cy=\"10\" r=\"10\" stroke=\"gray\" fill=\"white\"  shape-rendering=\"geometricPrecision\"/>\n              <line x1=\"5\" y1=\"5\" x2=\"15\" y2=\"15\" stroke=\"black\" stroke-width=\"2\" shape-rendering=\"geometricPrecision\"/>\n              <line x1=\"5\" y1=\"15\" x2=\"15\" y2=\"5\" stroke=\"black\" stroke-width=\"2\" shape-rendering=\"geometricPrecision\"/>\n            </svg>\n\t\t\t\t\t</button>\n\t\t\t\t\tResuming your schedule\n\t\t\t\t</div>\n        <div style=\"padding-top: 20px; padding-bottom: 20px;\" ng-if=\"config.sensors_onmain\">\n          <div class=\"ecobee-menu-item\" ng-repeat=\"item in itemsInGroup(config.remote_sensors) track by $index\" ng-if=\"$index % 2 == 0\">\n\t\t\t\t\t\t<div class=\"ecobee-menu-topic\">\n              {{item.label}} \n              <br/>\n             \t{{itemValue(config.use_celsius) == 'ON'? '%.1f °C':'%.0f °F' | sprintf:item.state}} <span class=\"{{itemsInGroup(config.remote_sensors)[$index+1].state == 'ON' ? 'ecobee-occupied' : ''}}\">({{itemsInGroup(config.remote_sensors)[$index+1].state == 'ON' ? 'Occupied' : 'Unoccupied'}})</span>\n            </div>\n\t\t\t\t\t</div>\n        </div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"ecobee-footer\" ng-if=\"!config.sensors_onmain\">\n\t\t\t<h4>\n\t\t\t\t<button class=\"ecobee-btn ecobee-btn-icon\" ng-click=\"config.active_panel='ecobee-menu'\">\n\t\t\t\t\t<i class=\"glyphicon glyphicon-menu-hamburger\"></i>\n\t\t\t\t</button>\n\t\t\t</h4>\n\t\t</div>\n\t</div>\n<!--------------------------------------------------------------- Ecobee HVAC Select Panel --------------------------------------------------------------->\n\t<div class=\"ecobee-content-panel\" style=\"display: table;\" ng-show=\"config.active_panel == 'ecobee-hvacselect'\">\n\t\t<div style=\"display: table-cell; vertical-align: middle;\">\n\t\t\t<div>\n\t\t\t\t<button class=\"ecobee-btn ecobee-btn-icon ecobee-btn-hvac\" ng-click=\"config.active_panel='ecobee-main'\">          \n\t\t\t\t\t<img class=\"ecobee-mode-icon\" src=\"/static/images/ecobee/{{itemValue(config.hvac_mode) | lowercase}}.png\" ng-if=\"itemValue(config.hvac_mode) != 'off'\"/>\n\t\t\t\t\t<div class=\"ecobee-mode-off\" ng-if=\"itemValue(config.hvac_mode) == 'off'\">OFF</div>\n\t\t\t\t</button>\n\t\t\t</div>\n\t\t\t<div class=\"ecobee-hvac-btn-group\">\n\t\t\t\t<button ng-class=\"(itemValue(config.hvac_mode) == 'heat') ? 'ecobee-btn-selected' : 'ecobee-btn'\" ng-click=\"sendCmd(config.hvac_mode, 'heat'); config.active_panel='ecobee-main'\">Heat</button>\n\t\t\t\t<button ng-class=\"(itemValue(config.hvac_mode) == 'cool') ? 'ecobee-btn-selected' : 'ecobee-btn'\" ng-click=\"sendCmd(config.hvac_mode, 'cool'); config.active_panel='ecobee-main'\">Cool</button>\n\t\t\t\t<button ng-class=\"(itemValue(config.hvac_mode) == 'auto') ? 'ecobee-btn-selected' : 'ecobee-btn'\" ng-click=\"sendCmd(config.hvac_mode, 'auto'); config.active_panel='ecobee-main'\">Auto</button>\n\t\t\t\t<button ng-class=\"(itemValue(config.hvac_mode) == 'off') ? 'ecobee-btn-selected' : 'ecobee-btn'\" ng-click=\"sendCmd(config.hvac_mode, 'off'); config.active_panel='ecobee-main'\">Off</button>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n<!--------------------------------------------------------------- Ecobee Menu Panel --------------------------------------------------------------->\n\t<div class=\"ecobee-content-panel\" ng-show=\"config.active_panel == 'ecobee-menu'\">\n    <div><h4>Main Menu</h4></div>\n\t\t<div style=\"flex: 1; flex-grow: 1;\">\n\t\t\t<div class=\"ecobee-mainmenu-item\">Sensors</div>\n\t\t\t<div class=\"ecobee-sensors\">\n\t\t\t\t<div class=\"ecobee-menu-item\" ng-repeat=\"item in itemsInGroup(config.remote_sensors) track by $index\" ng-if=\"$index % 2 == 0\">\n\t\t\t\t\t<div class=\"ecobee-menu-topic\">{{item.label}}</div>\n\t\t\t\t\t<div class=\"ecobee-menu-data ecobee-menu-info\">\n            {{itemValue(config.use_celsius) == 'ON'? '%.1f °C':'%.0f °F' | sprintf:item.state}} <span class=\"{{itemsInGroup(config.remote_sensors)[$index+1].state == 'ON' ? 'ecobee-occupied' : ''}}\">({{itemsInGroup(config.remote_sensors)[$index+1].state == 'ON' ? 'Occupied' : 'Unoccupied'}})</span></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t\t<div class=\"ecobee-footer\">\n\t\t\t<h4>\n\t\t\t\t<button class=\"ecobee-btn ecobee-btn-icon\" ng-click=\"config.active_panel='ecobee-main'\">\n\t\t\t\t\t<i class=\"glyphicon glyphicon-menu-hamburger\"></i>\n\t\t\t\t</button>\n\t\t\t</h4>\n\t\t</div>\n\t</div>\n\n</div>"
+}
