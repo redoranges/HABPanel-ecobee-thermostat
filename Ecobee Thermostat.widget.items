@@ -26,7 +26,7 @@ Number ET_runtime_desiredCool       (ET_gRuntime) { ecobee="<[123456789012#runti
 //
 // The first two items ET_mainThermostat_ represent the main thermostats real temperatue and occupancy
 // then come the remote sensors ET_Remote_*
-//     Add or remove as many pairs of temperature and occupancy items under ET_gRemoteSensors as you need
+//     Add or remove up to 5 pairs of temperature and occupancy items under ET_gRemoteSensors
 Group ET_gRemoteSensors (ET_All)
 //First item in sensor list is the real thermostat
 Number ET_mainThermostat_temperature    "Downstairs [%.1f °C]"      (ET_gRemoteSensors) { ecobee="<[123456789012#remoteSensors(Downstairs).capability(temperature).value]" }
